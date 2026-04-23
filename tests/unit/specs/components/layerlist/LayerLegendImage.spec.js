@@ -170,6 +170,25 @@ describe('layerlist/LayerLegendImage.vue', () => {
         'SCALE=3571428.571428572&language=de&SLD_VERSION=1.1.0');
     });
 
+    it('legendURL supports WMS style parameter', async () => {
+      await comp.setProps({ layer: wmsLayer });
+
+      expect(vm.legendURL).to.equal('https://ahocevar.com/geoserver/wms?' +
+        'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&FORMAT=image%2Fpng&LAYER=topp%3Astates&' +
+        'SCALE=3571428.571428572&language=en&SLD_VERSION=1.1.0');
+
+      const source = wmsLayer.getSource();
+      const params = source.getParams();
+      source.updateParams({
+        ...params,
+        STYLES: 'foo'
+      });
+
+      expect(vm.legendURL).to.equal('https://ahocevar.com/geoserver/wms?' +
+        'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&FORMAT=image%2Fpng&LAYER=topp%3Astates&' +
+        'SCALE=3571428.571428572&language=en&SLD_VERSION=1.1.0&STYLE=foo');
+    })
+
     afterEach(() => {
       vm.$i18n.locale = 'en';
       comp.unmount();
