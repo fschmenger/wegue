@@ -103,14 +103,23 @@ const WMSSourceLegend = {
    * @returns {String} The legend URL.
    */
   getUrl (source, resolution, options) {
+    const legendOptions = { ...options };
+
     const wmsParams = source.getParams();
     const wmsVersion = ObjectUtil.getValueIgnoreCase(wmsParams, 'VERSION') || '1.3.0';
-    // apply mandatory SLD_VERSION param for WMS 1.3.0 GetLegendGraphic request
-    if (wmsVersion === '1.3.0' && !ObjectUtil.getValueIgnoreCase(options, 'SLD_VERSION')) {
-      options.SLD_VERSION = '1.1.0';
+
+    // Apply mandatory SLD_VERSION param for WMS 1.3.0 GetLegendGraphic request.
+    if (wmsVersion === '1.3.0' && !ObjectUtil.getValueIgnoreCase(legendOptions, 'SLD_VERSION')) {
+      legendOptions.SLD_VERSION = '1.1.0';
     }
 
-    return source.getLegendUrl(resolution, options);
+    // Forward STYLES param, which may affect the legends appearance.
+    const wmsStyle = ObjectUtil.getValueIgnoreCase(wmsParams, 'STYLES');
+    if (wmsStyle && !ObjectUtil.getValueIgnoreCase(legendOptions, 'STYLE')) {
+      legendOptions.STYLE = wmsStyle;
+    }
+
+    return source.getLegendUrl(resolution, legendOptions);
   }
 }
 
