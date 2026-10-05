@@ -134,6 +134,7 @@ export default class HoverController {
             if (!axios.isCancel(error)) {
               console.error(error.message);
             }
+            throw error;
           });
       }
 
